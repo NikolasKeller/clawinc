@@ -1,10 +1,9 @@
 import { useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "./lib/utils"
 import { PromptInputBox } from "./components/PromptInputBox"
 import { ChannelSelector } from "./components/ChannelSelector"
 
 import { AnimatePresence, motion } from "framer-motion"
-import { UseCaseCloud } from "./components/UseCaseCloud"
 import { Pricing } from "./components/pricing"
 
 function App() {
@@ -83,8 +82,8 @@ function App() {
         "w-full max-w-4xl flex flex-col items-center z-10 relative transition-all duration-500",
         showPricing ? "space-y-4" : "space-y-12"
       )}>
-        <h1 className="text-5xl md:text-7xl font-bold text-center text-[#ff4f00] tracking-tight">
-          Lobster, Inc.
+        <h1 className="text-6xl md:text-8xl font-bold text-center text-[#ff4f00] tracking-tight">
+          Lobster Labs
         </h1>
 
         <div className="w-full flex justify-center min-h-[400px]">
@@ -99,7 +98,12 @@ function App() {
                 className="w-full max-w-2xl flex flex-col items-center mt-6"
               >
                 <ChannelSelector onSelectChannel={handleSelectChannel} />
-                <UseCaseCloud />
+
+                {/* Lobsters under the window */}
+                <div className="flex gap-48 mt-20 items-center">
+                  <img src="/lobster.png" className="w-16 h-16 opacity-20 still-lobster -rotate-12" alt="" />
+                  <img src="/lobster.png" className="w-24 h-24 opacity-30 still-lobster rotate-[200deg] transform scale-x-[-1] relative top-8" alt="" />
+                </div>
               </motion.div>
             )}
 
