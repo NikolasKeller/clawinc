@@ -5,11 +5,14 @@ import { ChannelSelector } from "./components/ChannelSelector"
 
 import { AnimatePresence, motion } from "framer-motion"
 import { Pricing } from "./components/pricing"
+import { OnboardingPage } from "./components/OnboardingPage"
 
 function App() {
 
   const [hasSentMessage, setHasSentMessage] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
 
   const handleSend = (msg: string, files?: File[]) => {
@@ -19,10 +22,16 @@ function App() {
 
   const handleSelectChannel = (channel: string) => {
     console.log("Selected channel:", channel);
+    setSelectedChannel(channel);
+    setShowOnboarding(true);
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
     setShowPricing(true);
   };
 
-  const currentStep = showPricing ? 'pricing' : hasSentMessage ? 'input' : 'channel';
+  const currentStep = showPricing ? 'pricing' : showOnboarding ? 'onboarding' : hasSentMessage ? 'input' : 'channel';
 
   const demoPlans = [
     {
@@ -68,8 +77,8 @@ function App() {
         layout
         initial={false}
         animate={{
-          top: showPricing ? 15 : 80,
-          scale: showPricing ? 0.7 : 1,
+          top: (showPricing || showOnboarding) ? 15 : 80,
+          scale: (showPricing || showOnboarding) ? 0.7 : 1,
         }}
         transition={{
           duration: 2.0,
@@ -83,7 +92,7 @@ function App() {
         </h1>
       </motion.div>
 
-      {!showPricing && (
+      {(!showPricing && !showOnboarding) && (
         <div className={cn(
           "w-full max-w-4xl flex flex-col items-center z-10 relative transition-all duration-500",
           "mt-32 space-y-12"
@@ -130,6 +139,23 @@ function App() {
       )}
 
       <AnimatePresence>
+        {showOnboarding && selectedChannel && (
+          <motion.div
+            key="onboarding"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 1.3, ease: "easeOut" }}
+          >
+            <OnboardingPage
+              channel={selectedChannel}
+              onScanned={handleOnboardingComplete}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {showPricing && (
           <motion.div
             key="pricing-full"
@@ -155,9 +181,9 @@ function App() {
         )}
       </AnimatePresence>
 
-      {!showPricing && (
+      {(!showPricing && !showOnboarding) && (
         <>
-          {/* Decorative Background Lobsters (Still) */}
+          {/* Decorative Background Lobsters (Original Approved Version) */}
           <img src="/lobster.png" className="fixed top-20 left-[10%] w-24 h-24 opacity-40 pointer-events-none pixel-art still-lobster z-0" alt="" />
           <img src="/lobster.png" className="fixed bottom-40 left-[15%] w-32 h-32 opacity-30 pointer-events-none pixel-art still-lobster z-0 rotate-12" alt="" />
           <img src="/lobster.png" className="fixed top-40 right-[12%] w-20 h-20 opacity-40 pointer-events-none pixel-art still-lobster z-0 -rotate-12" alt="" />

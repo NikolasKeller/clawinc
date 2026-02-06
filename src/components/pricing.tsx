@@ -85,12 +85,12 @@ export function Pricing({
                 : { y: 0, opacity: 1 }
             }
             transition={{
-              duration: 1.6,
+              duration: 1.2,
               type: "spring",
-              stiffness: 100,
-              damping: 30,
+              stiffness: 120,
+              damping: 25,
               delay: 0.4,
-              opacity: { duration: 0.5 },
+              opacity: { duration: 0.4 },
             }}
             className={cn(
               `rounded-2xl border-2 p-4 bg-white text-[#ff4f00] text-center lg:flex lg:flex-col lg:justify-center relative`,
