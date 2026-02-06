@@ -27,13 +27,11 @@ interface PricingPlan {
 interface PricingProps {
   plans: PricingPlan[];
   title?: string;
-  description?: string;
 }
 
 export function Pricing({
   plans,
   title = "Simple, Transparent Pricing",
-  description = "Choose the plan that works for you\nAll plans include access to our platform, lead generation tools, and dedicated support.",
 }: PricingProps) {
   const [isMonthly, setIsMonthly] = useState(true);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -69,38 +67,14 @@ export function Pricing({
   };
 
   return (
-    <div className="container py-8">
-      <div className="text-center space-y-2 mb-6">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl font-lobster-brand text-[#ff4f00]">
-          {title}
-        </h2>
-        <p className="text-muted-foreground text-sm whitespace-pre-line">
-          {description}
-        </p>
-      </div>
-
-      <div className="flex justify-center mb-6">
-        <label className="relative inline-flex items-center cursor-pointer">
-          <Label>
-            <Switch
-              ref={switchRef as any}
-              checked={!isMonthly}
-              onCheckedChange={handleToggle}
-              className="relative"
-            />
-          </Label>
-        </label>
-        <span className="ml-2 font-semibold text-sm">
-          Annual billing <span className="text-[#ff4f00]">(Save 20%)</span>
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 sm:2 gap-4">
+    <div className="container pb-8 pt-8">
+      {/* Tiers Grid First */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto px-4">
         {plans.map((plan, index) => (
           <motion.div
             key={index}
-            initial={{ y: 50, opacity: 1 }}
-            whileInView={
+            initial={{ y: 50, opacity: 0 }}
+            animate={
               isDesktop
                 ? {
                   y: plan.isPopular ? -20 : 0,
@@ -108,9 +82,8 @@ export function Pricing({
                   x: index === 2 ? -30 : index === 0 ? 30 : 0,
                   scale: index === 0 || index === 2 ? 0.94 : 1.0,
                 }
-                : {}
+                : { y: 0, opacity: 1 }
             }
-            viewport={{ once: true }}
             transition={{
               duration: 1.6,
               type: "spring",
@@ -120,8 +93,8 @@ export function Pricing({
               opacity: { duration: 0.5 },
             }}
             className={cn(
-              `rounded-2xl border-[1px] p-4 bg-white text-[#ff4f00] text-center lg:flex lg:flex-col lg:justify-center relative`,
-              plan.isPopular ? "border-[#ff4f00] border-2" : "border-orange-200",
+              `rounded-2xl border-2 p-4 bg-white text-[#ff4f00] text-center lg:flex lg:flex-col lg:justify-center relative`,
+              plan.isPopular ? "border-[#ff4f00] border-[3px]" : "border-orange-200",
               "flex flex-col",
               !plan.isPopular && "mt-2",
               index === 0 || index === 2
@@ -132,38 +105,46 @@ export function Pricing({
             )}
           >
             {plan.isPopular && (
-              <div className="absolute top-0 right-0 bg-primary py-0.5 px-2 rounded-bl-xl rounded-tr-xl flex items-center">
-                <Star className="text-primary-foreground h-4 w-4 fill-current" />
-                <span className="text-primary-foreground ml-1 font-sans font-semibold">
+              <div className="absolute top-0 right-0 bg-[#ff4f00] py-0.5 px-2 rounded-bl-xl rounded-tr-xl flex items-center">
+                <Star className="text-white h-4 w-4 fill-current" />
+                <span className="text-white ml-1 font-sans font-semibold">
                   Popular
                 </span>
               </div>
             )}
             <div className="flex-1 flex flex-col">
-              <p className="text-sm font-semibold text-[#ff4f00]/80">
+              <p className="text-4xl font-bold text-[#ff4f00] mt-2 mb-4">
                 {plan.name}
               </p>
               <div className="mt-2 flex items-center justify-center gap-x-1">
-                <span className="text-3xl font-bold tracking-tight text-[#ff4f00]">
-                  <NumberFlow
-                    value={
-                      isMonthly ? Number(plan.price) : Number(plan.yearlyPrice)
-                    }
-                    format={{
-                      style: "currency",
-                      currency: "USD",
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,
-                    }}
-
-                    willChange
-                    className="font-variant-numeric: tabular-nums"
-                  />
-                </span>
-                {plan.period !== "Next 3 months" && (
-                  <span className="text-sm font-semibold leading-6 tracking-wide text-[#ff4f00]/70">
-                    / {plan.period}
+                {plan.price === "0" ? (
+                  <span className="text-3xl font-bold tracking-tight text-[#ff4f00]">
+                    Custom
                   </span>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold tracking-tight text-[#ff4f00]">
+                      <NumberFlow
+                        value={
+                          isMonthly ? Number(plan.price) : Number(plan.yearlyPrice)
+                        }
+                        format={{
+                          style: "currency",
+                          currency: "USD",
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        }}
+
+                        willChange
+                        className="font-variant-numeric: tabular-nums"
+                      />
+                    </span>
+                    {plan.period !== "Next 3 months" && (
+                      <span className="text-sm font-semibold leading-6 tracking-wide text-[#ff4f00]/70">
+                        / {isMonthly ? plan.period : 'year'}
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -189,9 +170,9 @@ export function Pricing({
                     variant: "outline",
                   }),
                   "group relative w-full gap-2 overflow-hidden text-lg font-semibold tracking-tighter",
-                  "transform-gpu ring-offset-current transition-all duration-300 ease-out hover:ring-2 hover:ring-primary hover:ring-offset-1 hover:bg-primary hover:text-primary-foreground",
+                  "transform-gpu ring-offset-current transition-all duration-300 ease-out hover:ring-2 hover:ring-[#ff4f00] hover:ring-offset-1 hover:bg-[#ff4f00] hover:text-white",
                   plan.isPopular
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#ff4f00] text-white"
                     : "bg-background text-foreground"
                 )}
               >
@@ -204,6 +185,36 @@ export function Pricing({
           </motion.div>
         ))}
       </div>
+
+      {/* Title, Description and Toggle Underneath */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.6, delay: 0.8 }}
+        className="flex flex-col items-center space-y-6"
+      >
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-[#ff4f00]">
+            {title}
+          </h2>
+
+          <div className="flex items-center justify-center">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <Label>
+                <Switch
+                  ref={switchRef as any}
+                  checked={!isMonthly}
+                  onCheckedChange={handleToggle}
+                  className="relative"
+                />
+              </Label>
+            </label>
+            <span className="ml-2 font-semibold text-sm text-[#ff4f00]">
+              Annual billing <span className="opacity-70">(Save 20%)</span>
+            </span>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
